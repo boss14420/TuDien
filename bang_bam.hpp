@@ -168,7 +168,8 @@ public:
     friend class HashIterator<Key, T, HamBam, SoSanh>;
     //friend class iterator;
 
-    BangBam (std::size_t preserve_size = 11) : _size(0), _soSanh()
+    BangBam (std::size_t preserve_size = 11) 
+        : _size(0), _max_load_factor(.75f), _soSanh()
     {
         _hamBam.setBucket(preserve_size);
         _table.resize(_hamBam.bucketCount());
@@ -186,6 +187,12 @@ public:
     bool erase (key_type const &key);
 
     void clear();
+
+    //void max_load_factor (float load_factor);
+
+    float max_load_factor () const { return _max_load_factor; }
+
+    float load_factor() const { return (float)_size / _table.size(); }
 
     void rehash (std::size_t count);
 
@@ -209,6 +216,7 @@ private:
 
     std::vector<list_type> _table; 
     std::size_t _size;
+    float _max_load_factor;
     HamBam _hamBam;
     SoSanh _soSanh;
 };
@@ -278,8 +286,12 @@ BangBam<Key, T, HamBam, SoSanh>::insert (
     if (li != _table[bucket].end())
         return std::make_pair(iterator(bucket, li, this), false);
     
-    li = _table[bucket].insert(li, value);
     ++_size;
+    if (load_factor() > max_load_factor()) {
+        rehash(_table.size() * 2 + 1);
+        bucket = _hamBam(value.first);
+    }
+    li = _table[bucket].insert(li, value);
     return std::make_pair(iterator(bucket, li, this), true);
 }
 
@@ -349,7 +361,7 @@ template <typename Key, typename T, typename HamBam, typename SoSanh>
 void
 BangBam<Key, T, HamBam, SoSanh>::reserve(std::size_t count)
 {
-    //rehash(std::ceil(count / max_load_factor()));
+    rehash(std::ceil(count / max_load_factor()));
 }
 
 

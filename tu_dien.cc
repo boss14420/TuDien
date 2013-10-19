@@ -128,7 +128,7 @@ TuDien::nhapTuFile(std::string const &filename, char delim)
     std::string tanh, tviet;
     ifs >> soTu;
     ifs >> std::skipws;
-    _bangBam.rehash(soTu);
+    _bangBam.reserve(soTu);
     while (soTu--) {
         std::getline(ifs, tanh, delim);
         std::getline(ifs, tviet);
