@@ -25,7 +25,7 @@
 
 struct HamBamChuoi {
 public:
-    _HamBam() : _numBucket(11) {} 
+    HamBamChuoi(std::size_t sz = 11) : _numBucket(sz) {} 
     std::size_t bucketCount() const { return _numBucket; }
     void setBucket(std::size_t count) { _numBucket = count; }
 
@@ -68,7 +68,7 @@ public:
     typedef std::list<value_type> list_type;
     typedef std::vector<list_type> bang_bam;
 
-    TuDien();
+    TuDien(std::size_t preserve_size = 11);
 
     bool timTu(std::string const &tanh, std::string &tviet) const;
 
@@ -82,11 +82,27 @@ public:
 
     void luuVaoFile(std::string const &filename, char delim = ':') const;
 
-private:
-    list_type::iterator timKhoa(std::string const &key, std::size_t &bucket);
+    std::size_t size() const { return _size; }
 
+private:
+    list_type::const_iterator 
+        timKhoa(std::string const &key, std::size_t &bucket) const;
+
+    list_type::iterator
+        timKhoa(std::string const &key, std::size_t &bucket);
+
+    float load_factor() const { return (float)_size / _bangBam.size(); }
+
+    float max_load_factor() const { return _max_load_factor; }
+
+    void rehash(std::size_t count);
+
+    void reserve(std::size_t count);
+
+private:
     bang_bam _bangBam;
     std::size_t _size;
+    float _max_load_factor;
     HamBamChuoi _hamBam;
     SoSanhChuoi _soSanh;
 };
