@@ -1,2 +1,5 @@
 # Vim backup file
 *~
+
+# object file
+*.o
