@@ -1,0 +1,5 @@
+4
+hello : Xin chào
+world : thế giới
+one : một
+two : hai
