@@ -1,7 +1,7 @@
 [Project]
 FileName=TuDien.dev
 Name=TuDien
-UnitCount=5
+UnitCount=3
 Type=1
 Ver=1
 ObjFiles=
@@ -29,18 +29,8 @@ SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=
 
-[Unit1]
-FileName=bang_bam.hpp
-CompileCpp=1
-Folder=TuDien
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit2]
-FileName=main.cc
+FileName=tu_dien.cc
 CompileCpp=1
 Folder=TuDien
 Compile=1
@@ -50,7 +40,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit3]
-FileName=tu_dien.cc
+FileName=tu_dien.hh
 CompileCpp=1
 Folder=TuDien
 Compile=1
@@ -92,6 +82,16 @@ FileName=Makefile
 Folder=TuDien
 Compile=0
 Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit1]
+FileName=main.cc
+CompileCpp=1
+Folder=TuDien
+Compile=1
+Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
