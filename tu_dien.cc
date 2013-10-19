@@ -30,6 +30,9 @@
 TuDien::TuDien()
 {}
 
+/*
+ */
+
 
 /*
  * phương thức tìm nghĩa của từ trong từ điển
@@ -40,8 +43,9 @@ TuDien::TuDien()
 bool
 TuDien::timTu(std::string const &tanh, std::string &tviet) const
 {
-    bang_bam::const_iterator it = _bangBam.find(tanh);
-    if (it != _bangBam.end()) {
+    std::size_t bucket;
+    list_type::const_iterator it = timKhoa(tanh, bucket);
+    if (it != _bangBam[bucket].end()) {
         tviet = it->second;
         return true;
     }
@@ -58,8 +62,9 @@ TuDien::timTu(std::string const &tanh, std::string &tviet) const
 bool
 TuDien::suaDoiTu(std::string const &tanh, std::string const &tviet)
 {
-    bang_bam::iterator it = _bangBam.find(tanh);
-    if (it != _bangBam.end()) {
+    std::size_t bucket;
+    list_type::iterator it = timKhoa(tanh, bucket);
+    if (it != _bangBam[bucket].end()) {
         it->second = tviet;
         return true;
     }
@@ -76,7 +81,18 @@ TuDien::suaDoiTu(std::string const &tanh, std::string const &tviet)
 bool
 TuDien::themTu(std::string const &tanh, std::string const &tviet)
 {
-    return _bangBam.insert(std::make_pair(tanh, tviet)).second;
+    std::size_t bucket;
+    list_type::iterator it = timKhoa(tanh, bucket);
+    if (it != _bangBam[bucket].end())
+        return false;
+
+    ++_size;
+    if (load_factor() > max_load_factor()) {
+        rehash(_size * 2 + 1);
+        bucket = _hamBam(tanh);
+    }
+    _bangBam[bucket].insert(std::make_pair(tanh, tviet));
+    return true;
 }
 
 
@@ -89,22 +105,36 @@ TuDien::themTu(std::string const &tanh, std::string const &tviet)
 bool
 TuDien::xoaTu(std::string const &tanh)
 {
-    return _bangBam.erase(tanh);
+    std::size_t bucket;
+    list_type::iterator it = timKhoa(tanh, bucket);
+    if (it == _bangBam[bucket].end())
+        return false;
+
+    _bangBam[bucket].erase(it);
+    --_size;
+    return true;
 }
 
 
+/*
+ * Xoá khoảng trắng bên trái
+ */
 static inline std::string &ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
     return s;
 }
 
-// trim from end
+/*
+ * Xoá khoảng trắng bên phải
+ */
 static inline std::string &rtrim(std::string &s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
     return s;
 }
 
-// trim from both ends
+/*
+ * Xoá khoảng trắng 2 bên
+ */
 static inline std::string &trim(std::string &s) {
     return ltrim(rtrim(s));
 }
@@ -123,16 +153,17 @@ TuDien::nhapTuFile(std::string const &filename, char delim)
     ifs.open(filename.data());
 
     _bangBam.clear();
+    _size = 0;
 
     std::size_t soTu;
     std::string tanh, tviet;
     ifs >> soTu;
     ifs >> std::skipws;
-    _bangBam.reserve(soTu);
+    reserve(soTu);
     while (soTu--) {
         std::getline(ifs, tanh, delim);
         std::getline(ifs, tviet);
-        _bangBam.insert(std::make_pair(trim(tanh), trim(tviet)));
+        themTu(tanh, tviet);
     }
     ifs.close();
 }
@@ -151,10 +182,35 @@ TuDien::luuVaoFile(std::string const &filename, char delim) const
     ofs.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     ofs.open(filename.data());
 
-    ofs << _bangBam.size() << '\n';
-    bang_bam::iterator it = _bangBam.begin();
-    for (; it != _bangBam.end(); ++it) {
-        ofs << it->first << " : " << it->second << '\n';
+    ofs << _size << '\n';
+    list_type::iterator it;
+    for (std::size_t i = 0; i != _bangBam.size(); ++i) {
+        for (it = _bangBam[i].begin(); it != _bangBam[i].end(); ++it) {
+            ofs << it->first << " : " << it->second << '\n';
+        }
     }
     ofs.close();
+}
+
+
+/*
+ * Tìm khóa trong bảng băm
+ * \param key: từ khóa cần tìm
+ * \bucket: vị trí của khóa trong bảng băm
+ * \return biến lặp đến vị trí của khóa trong danh sách
+ * kết ở bucket
+ */
+
+TuDien::list_type::iterator 
+TuDien::timKhoa(std::string const &key, std::size_t &bucket)
+{
+    bucket = _hamBam(key);
+    list_type::iterator it = _bangBam[bucket].begin();
+    for (; it != _bangBam[bucket].end(); ++it) {
+        if (_soSanh(it->first, key))
+            return it;
+    }
+
+    // Nếu không tìm thấy thì trả về end của bucket
+    return it;
 }

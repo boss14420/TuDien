@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  tu_dien.hpp
+ *       Filename:  tu_dien2.hh
  *
  *    Description:  Lớp Từ điển
  *
@@ -19,10 +19,16 @@
 #ifndef __TU_DIEN__
 #define __TU_DIEN__
 
-#include "bang_bam.hpp"
 #include <string>
+#include <vector>
+#include <list>
 
-struct HamBamChuoi : _HamBam<std::string> {
+struct HamBamChuoi {
+public:
+    _HamBam() : _numBucket(11) {} 
+    std::size_t bucketCount() const { return _numBucket; }
+    void setBucket(std::size_t count) { _numBucket = count; }
+
     // hàm băm FNV-1
     std::size_t operator() (std::string const &str) const {
         unsigned long long h = 14695981039346656037ULL;
@@ -33,6 +39,9 @@ struct HamBamChuoi : _HamBam<std::string> {
         }
         return h % bucketCount();
     }
+
+private:
+    std::size_t _numBucket;
 };
 
 struct SoSanhChuoi {
@@ -53,8 +62,11 @@ struct SoSanhChuoi {
  */
 class TuDien {
 public:
-    typedef BangBam<std::string, std::string, HamBamChuoi, SoSanhChuoi> 
-                bang_bam;
+    typedef std::string key_type;
+    typedef std::string mapped_type;
+    typedef std::pair<key_type, mapped_type> value_type;
+    typedef std::list<value_type> list_type;
+    typedef std::vector<list_type> bang_bam;
 
     TuDien();
 
@@ -71,7 +83,12 @@ public:
     void luuVaoFile(std::string const &filename, char delim = ':') const;
 
 private:
+    list_type::iterator timKhoa(std::string const &key, std::size_t &bucket);
+
     bang_bam _bangBam;
+    std::size_t _size;
+    HamBamChuoi _hamBam;
+    SoSanhChuoi _soSanh;
 };
 
 
