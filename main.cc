@@ -160,9 +160,13 @@ void menu(TuDien &td) {
 
 int main(int argc, char *argv[]) {
     TuDien td;
-    std::string filename = DEFAULT_FILE;
-    if (argc >= 2) filename = argv[1];
-    td.nhapTuFile(filename);
+    if (argc >= 2) {
+	std::string filename = argv[1];
+	try {
+	    td.nhapTuFile(filename);
+	} catch (std::exception &ex) {
+	}
+    }
 
     menu(td);
 

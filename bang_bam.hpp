@@ -362,7 +362,7 @@ template <typename Key, typename T, typename HamBam, typename SoSanh>
 void
 BangBam<Key, T, HamBam, SoSanh>::reserve(std::size_t count)
 {
-    rehash(std::ceil(count / max_load_factor()));
+    rehash((std::size_t)std::ceil(count / max_load_factor()));
 }
 
 
