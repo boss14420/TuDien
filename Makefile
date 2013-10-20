@@ -1,6 +1,6 @@
 all: tudien
 
-CXX = g++
+CXX = clang++
 CXXFLAGS = -g -Wall
 
 tudien: main.o tu_dien.o
@@ -9,7 +9,7 @@ tudien: main.o tu_dien.o
 main.o: main.cc tu_dien.hh
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-tu_dien.o: tu_dien.cc tu_dien.hh
+tu_dien.o: tu_dien.cc tu_dien.hh bang_bam.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:

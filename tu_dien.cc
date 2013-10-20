@@ -28,11 +28,8 @@
 /*
  * Phương thức khởi tạo
  */
-TuDien::TuDien(std::size_t preserve_size)
-    : _size(0), _max_load_factor(.75), _hamBam(preserve_size), _soSanh()
-{
-    _bangBam.resize(_hamBam.bucketCount());
-}
+TuDien::TuDien() : _bangBam()
+{}
 
 /*
  */
@@ -47,9 +44,8 @@ TuDien::TuDien(std::size_t preserve_size)
 bool
 TuDien::timTu(std::string const &tanh, std::string &tviet) const
 {
-    std::size_t bucket;
-    list_type::const_iterator it = timKhoa(tanh, bucket);
-    if (it != _bangBam[bucket].end()) {
+    const_iterator it = _bangBam.tim(tanh);
+    if (it != _bangBam.end()) {
         tviet = it->second;
         return true;
     }
@@ -66,13 +62,7 @@ TuDien::timTu(std::string const &tanh, std::string &tviet) const
 bool
 TuDien::suaDoiTu(std::string const &tanh, std::string const &tviet)
 {
-    std::size_t bucket;
-    list_type::iterator it = timKhoa(tanh, bucket);
-    if (it != _bangBam[bucket].end()) {
-        it->second = tviet;
-        return true;
-    }
-    return false;
+    return _bangBam.suaDoi(std::make_pair(tanh, tviet)) != _bangBam.end();
 }
 
 
@@ -85,39 +75,19 @@ TuDien::suaDoiTu(std::string const &tanh, std::string const &tviet)
 bool
 TuDien::themTu(std::string const &tanh, std::string const &tviet)
 {
-    std::size_t bucket;
-    list_type::iterator it = timKhoa(tanh, bucket);
-    if (it != _bangBam[bucket].end())
-        return false;
-
-    ++_size;
-    if (load_factor() > max_load_factor()) {
-        rehash(_bangBam.size() * 2 + 1);
-        bucket = _hamBam(tanh);
-        it = _bangBam[bucket].end();
-    }
-    _bangBam[bucket].insert(it, std::make_pair(tanh, tviet));
-    return true;
+    return _bangBam.them(std::make_pair(tanh, tviet)).second;
 }
 
 
 /*
  * phương thức xóa từ trong từ điển
  * \param tanh: từ tiếng Anh
- * \param tviet: từ tiếng Việt tương ứng
  * \return: tanh có trong từ điển hay không
  */
 bool
 TuDien::xoaTu(std::string const &tanh)
 {
-    std::size_t bucket;
-    list_type::iterator it = timKhoa(tanh, bucket);
-    if (it == _bangBam[bucket].end())
-        return false;
-
-    _bangBam[bucket].erase(it);
-    --_size;
-    return true;
+    return _bangBam.xoa(tanh);
 }
 
 
@@ -148,7 +118,6 @@ static inline std::string &trim(std::string &s) {
  * Nhập từ điển từ file
  * \param filename: file từ điển
  * \param delim: phân cách giữa từ tiếng Anh và tiếng Việt
- * \return
  */
 void
 TuDien::nhapTuFile(std::string const &filename, char delim)
@@ -157,18 +126,17 @@ TuDien::nhapTuFile(std::string const &filename, char delim)
     ifs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     ifs.open(filename.data());
 
-    _bangBam.clear();
-    _size = 0;
+    _bangBam.xoaBangBam();
 
     std::size_t soTu;
     std::string tanh, tviet;
     ifs >> soTu;
     ifs >> std::skipws;
-    reserve(soTu);
+    _bangBam.reserve(soTu);
     while (soTu--) {
         std::getline(ifs, tanh, delim);
         std::getline(ifs, tviet);
-        themTu(trim(tanh), trim(tviet));
+        _bangBam.them(std::make_pair(trim(tanh), trim(tviet)));
     }
     ifs.close();
 }
@@ -187,82 +155,13 @@ TuDien::luuVaoFile(std::string const &filename, char delim) const
     ofs.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     ofs.open(filename.data());
 
-    ofs << _size << '\n';
-    list_type::const_iterator it;
-    for (std::size_t i = 0; i != _bangBam.size(); ++i) {
-        for (it = _bangBam[i].begin(); it != _bangBam[i].end(); ++it) {
-            ofs << it->first << " : " << it->second << '\n';
-        }
-    }
+    ofs << _bangBam.kich_thuoc() << '\n';
+    _bangBam.duyetBangBam((HamInTuDien){ofs});
     ofs.close();
 }
 
-
-/*
- * Tìm khóa trong bảng băm
- * \param key: từ khóa cần tìm
- * \bucket: vị trí của khóa trong bảng băm
- * \return biến lặp đến vị trí của khóa trong danh sách
- * kết ở bucket
- */
-
-TuDien::list_type::const_iterator 
-TuDien::timKhoa(std::string const &key, std::size_t &bucket) const
-{
-    bucket = _hamBam(key);
-    list_type::const_iterator it = _bangBam[bucket].begin();
-    for (; it != _bangBam[bucket].end(); ++it) {
-        if (_soSanh(it->first, key))
-            return it;
-    }
-
-    // Nếu không tìm thấy thì trả về end của bucket
-    return it;
-}
-
-TuDien::list_type::iterator 
-TuDien::timKhoa(std::string const &key, std::size_t &bucket)
-{
-    bucket = _hamBam(key);
-    list_type::iterator it = _bangBam[bucket].begin();
-    for (; it != _bangBam[bucket].end(); ++it) {
-        if (_soSanh(it->first, key))
-            return it;
-    }
-
-    // Nếu không tìm thấy thì trả về end của bucket
-    return it;
-}
-
-
-/*
- * Thay đổi số lượng bucket của bảng băm, đồng thời 
- * tính lại hash của tất cả các phần tử
- */
 void
-TuDien::rehash (std::size_t count)
+TuDien::HamInTuDien::operator() (TuDien::cap_gia_tri const &giaTri)
 {
-    _hamBam.setBucket(count);
-    if (!_size) {
-        _bangBam.resize(_hamBam.bucketCount());
-        return;
-    }
-
-    bang_bam bangBamMoi (_hamBam.bucketCount());
-    list_type::const_iterator it;
-    for (std::size_t i = 0; i != _bangBam.size(); ++i) {
-        for (it = _bangBam[i].begin(); it != _bangBam[i].end(); ++it)
-            bangBamMoi[_hamBam(it->first)].push_back(*it);
-    }
-    _bangBam.swap(bangBamMoi);
-}
-
-
-/*
- * Lấy chỗ trước cho ít nhất count bucket trong bảng băm
- */
-void
-TuDien::reserve (std::size_t count)
-{
-    rehash((std::size_t) std::ceil(count / max_load_factor()) + 1);
+    os << giaTri.first << " : " << giaTri.second << '\n';
 }

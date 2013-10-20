@@ -19,15 +19,14 @@
 #ifndef __TU_DIEN__
 #define __TU_DIEN__
 
+#include "bang_bam.hpp"
 #include <string>
-#include <vector>
-#include <list>
 
-struct HamBamChuoi {
+struct HamBamChuoi : HamBam<std::string> {
 public:
-    HamBamChuoi(std::size_t sz = 11) : _numBucket(sz) {} 
-    std::size_t bucketCount() const { return _numBucket; }
-    void setBucket(std::size_t count) { _numBucket = count; }
+    HamBamChuoi(std::size_t sz = 11) 
+        : HamBam<std::string>(sz) 
+    {} 
 
     // hàm băm FNV-1
     std::size_t operator() (std::string const &str) const {
@@ -37,11 +36,8 @@ public:
             h *= 1099511628211ULL;
             h ^= static_cast<unsigned long long>(std::tolower(*si));
         }
-        return h % bucketCount();
+        return h % bucket_count();
     }
-
-private:
-    std::size_t _numBucket;
 };
 
 struct SoSanhChuoi {
@@ -62,13 +58,14 @@ struct SoSanhChuoi {
  */
 class TuDien {
 public:
-    typedef std::string key_type;
-    typedef std::string mapped_type;
-    typedef std::pair<key_type, mapped_type> value_type;
-    typedef std::list<value_type> list_type;
-    typedef std::vector<list_type> bang_bam;
+    typedef BangBam<std::string, std::string, 
+                    HamBamChuoi, SoSanhChuoi> bang_bam;
+    typedef bang_bam::iterator iterator;
+    typedef bang_bam::const_iterator const_iterator;
+    typedef bang_bam::cap_gia_tri cap_gia_tri;
 
-    TuDien(std::size_t preserve_size = 11);
+public:
+    TuDien();
 
     bool timTu(std::string const &tanh, std::string &tviet) const;
 
@@ -82,29 +79,14 @@ public:
 
     void luuVaoFile(std::string const &filename, char delim = ':') const;
 
-    std::size_t size() const { return _size; }
-
 private:
-    list_type::const_iterator 
-        timKhoa(std::string const &key, std::size_t &bucket) const;
-
-    list_type::iterator
-        timKhoa(std::string const &key, std::size_t &bucket);
-
-    float load_factor() const { return (float)_size / _bangBam.size(); }
-
-    float max_load_factor() const { return _max_load_factor; }
-
-    void rehash(std::size_t count);
-
-    void reserve(std::size_t count);
+    struct HamInTuDien {
+        void operator() (cap_gia_tri const&);
+        std::ostream& os;
+    };
 
 private:
     bang_bam _bangBam;
-    std::size_t _size;
-    float _max_load_factor;
-    HamBamChuoi _hamBam;
-    SoSanhChuoi _soSanh;
 };
 
 
