@@ -48,9 +48,9 @@ class BangBam;
 \subsubsection otherclass Các lớp khác
 Chương trình có sử dụng các lớp hỗ trợ cho hai lớp #BangBam và #TuDien.
 
-Xem thêm: <a href="hierachy.html">Kiến trúc các lớp</a>
+\sa #HamBam, #HamBamChuoi, #SoSanhChuoi, #TuDien::HamInTuDien, <a href="hierarchy.html">Kiến trúc các lớp</a>
 
-\subsection function Các hàm từ do
+\subsection function Các hàm tự do
 Các cài đặt chức năng của chương trình đều ở dưới dạng hàm tự do, nằm
 ở file main.cc.
 
