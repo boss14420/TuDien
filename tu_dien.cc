@@ -16,8 +16,10 @@
  * =====================================================================================
  */
 
+/*! \file */
 
 #include "tu_dien.hh"
+#include <iostream>
 #include <fstream>
 #include <functional>
 #include <cctype>
@@ -25,9 +27,8 @@
 #include <algorithm>
 #include <cmath>
 
-/*
- * Phương thức khởi tạo
- */
+
+//! Phương thức khởi tạo
 TuDien::TuDien() : _bangBam()
 {}
 
@@ -35,8 +36,8 @@ TuDien::TuDien() : _bangBam()
  */
 
 
+//! phương thức tìm nghĩa của từ trong từ điển
 /*
- * phương thức tìm nghĩa của từ trong từ điển
  * \param tanh: từ tiếng Anh
  * \param tviet: từ tiếng Việt tương ứng
  * \return: tanh có trong từ điển hay không
@@ -53,8 +54,8 @@ TuDien::timTu(std::string const &tanh, std::string &tviet) const
 }
 
 
+//! phương thức sửa đổi nghĩa của từ trong từ điển
 /*
- * phương thức sửa đổi nghĩa của từ trong từ điển
  * \param tanh: từ tiếng Anh
  * \param tviet: từ tiếng Việt tương ứng
  * \return: tanh có trong từ điển hay không
@@ -66,8 +67,8 @@ TuDien::suaDoiTu(std::string const &tanh, std::string const &tviet)
 }
 
 
+//! phương thức thêm từ vào từ điển
 /*
- * phương thức sửa đổi nghĩa của từ trong từ điển
  * \param tanh: từ tiếng Anh
  * \param tviet: từ tiếng Việt tương ứng
  * \return: thêm có thành công hay không
@@ -79,8 +80,8 @@ TuDien::themTu(std::string const &tanh, std::string const &tviet)
 }
 
 
+//! phương thức xóa từ trong từ điển
 /*
- * phương thức xóa từ trong từ điển
  * \param tanh: từ tiếng Anh
  * \return: tanh có trong từ điển hay không
  */
@@ -114,10 +115,14 @@ static inline std::string &trim(std::string &s) {
     return ltrim(rtrim(s));
 }
 
+//! Nhập từ điển từ file
 /*
- * Nhập từ điển từ file
+ * File đầu vào cần có một só N chỉ số từ trong từ điển.
+ * Tiềp đó là N dòng, mỗi dòng 1 cặp (từ, nghĩa) được viết
+ * cách nhau bằng ký tự delim
  * \param filename: file từ điển
  * \param delim: phân cách giữa từ tiếng Anh và tiếng Việt
+ * \sa luuVaoFile
  */
 void
 TuDien::nhapTuFile(std::string const &filename, char delim)
@@ -142,11 +147,11 @@ TuDien::nhapTuFile(std::string const &filename, char delim)
 }
 
 
+//! Lưu từ điển vào file
 /*
- * Lưu từ điển vào file
  * \param filename: file từ điển
  * \param delim: phân cách giữa từ tiếng Anh và tiếng Việt
- * \return
+ * \sa nhapTuFile
  */
 void
 TuDien::luuVaoFile(std::string const &filename, char delim) const
@@ -160,6 +165,11 @@ TuDien::luuVaoFile(std::string const &filename, char delim) const
     ofs.close();
 }
 
+//! Hàm in cặp giá trị (từ - nghĩa)
+/*!
+ * \param giaTri: cặp giá trị cần in ra
+ * \sa luuVaoFile, nhapTuFile
+ */
 void
 TuDien::HamInTuDien::operator() (TuDien::cap_gia_tri const &giaTri)
 {

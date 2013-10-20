@@ -23,15 +23,49 @@
 
 #define DEFAULT_FILE "tu_dien.txt";
 
+/////////////////////////////////////////////////////
+////// Khai báo hàm
+/////////////////////////////////////////////////////
+
+/*! \file */
+
+//! Hàm hiện menu lựa chọn chức năng chương trình
 void menu(TuDien &td);
 
-void napTuDien(TuDien &td);
+//! Hàm thực hiện chức năng tìm kiếm từ điển
 void timKiem(TuDien const &td);
+
+//! Hàm thực hiện chức năng sửa đổi từ
 void suaDoiTu(TuDien &td);
+
+//! Hàm thực hiện chức năng thêm từ
 void themTu(TuDien &td);
+
+//! Hàm thực hiện chức năng xóa từ
 void xoaTu(TuDien &td);
+
+//! Hàm thực hiện chức năng lưu từ điển vào file
 void luuTuDien(TuDien const &td);
 
+//! Hàm thực hiện chức nằng nạp từ điển từ file
+void napTuDien(TuDien &td);
+
+
+
+//////////////////////////////////////////////////////
+/////// Cài đặt các chức năng
+//////////////////////////////////////////////////////
+
+//! Hàm thực hiện chức nằng nạp từ điển từ file
+/*!
+ * Khi thực hiện sẽ yêu cầu người dùng nhập đường dẫn
+ * đến file chứa từ điển. Định dạng từ điển phải tuân thủ
+ * yêu cầu ở #TuDien::nhapTuFile.
+ *
+ * Nếu trong quá trình thao tác file bị lỗi thì sẽ thông báo ra.
+ *
+ * \param td: Đối tượng từ điển
+ */
 void napTuDien(TuDien &td) {
     std::string filename;
     std::cout << "\nNhap tu dien tu file:\n"
@@ -48,6 +82,15 @@ void napTuDien(TuDien &td) {
 }
 
 
+//! Hàm thực hiện chức năng tìm kiếm từ điển
+/*!
+ * Tìm kiểm từ tiếng Anh trong từ điển (nếu có) và in ra nghĩa
+ * tiếng Việt của từ đó. Nếu không có sẽ báo lỗi.
+ * Hàm này sẽ liên tục hỏi các từ cho đến khi người dùng nhập
+ * chuỗi ".quit" thì mới trở về menu chính.
+ *
+ * \param td: Đối tượng từ điển
+ */
 void timKiem(TuDien const &td) {
     std::string tviet, tanh;
     while (true) {
@@ -64,6 +107,16 @@ void timKiem(TuDien const &td) {
     }
 }
 
+//! Hàm thực hiện chức năng sửa đổi từ
+/*!
+ * Yêu cầu người dùng nhập từ tiếng Anh, nếu từ này chưa có trong từ
+ * điển thì sẽ báo lỗi không tìm thấy, nếu có thì yêu cầu nhập nghĩa
+ * tiếng Việt mới để sửa trong từ điển.
+ *
+ * Quá trình này được thực hiện liên tục cho đến khi nhập ".quit"
+ *
+ * \param td: Đối tượng từ điển
+ */
 void suaDoiTu(TuDien &td) {
     std::string tviet, tanh;
     while (true) {
@@ -84,6 +137,16 @@ void suaDoiTu(TuDien &td) {
     }
 }
 
+//! Hàm thực hiện chức năng thêm từ
+/*!
+ * Yêu cầu người dùng nhập lần lượt nhập từ tiếng Anh và
+ * nghĩa tiếng Việt tương ứng để thêm vào từ điển. Nếu
+ * từ tiếng Anh đã có trong từ điển thì báo lỗi.
+ *
+ * Quá trình này được thực hiện liên tục cho đến khi nhập ".quit"
+ *
+ * \param td: Đối tượng từ điển
+ */
 void themTu(TuDien &td) {
     std::string tviet, tanh;
     while (true) {
@@ -101,6 +164,16 @@ void themTu(TuDien &td) {
     }
 }
 
+//! Hàm thực hiện chức năng xóa từ
+/*!
+ * Yêu cầu người dùng nhập vào từ tiếng Anh để xóa ra khỏi
+ * từ điển. Nếu từ không có sẵn trong từ điển thì sẽ báo
+ * lỗi.
+ *
+ * Quá trình này được thực hiện liên tục cho đến khi nhập ".quit"
+ *
+ * \param td: Đối tượng từ điển
+ */
 void xoaTu(TuDien &td) {
     std::string tanh;
     while (true) {
@@ -114,6 +187,14 @@ void xoaTu(TuDien &td) {
     }
 }
 
+//! Hàm thực hiện chức năng lưu từ điển vào file
+/*!
+ * Hỏi người dùng đường dẫn đến file để lưu từ điển vào.
+ * Nếu trong quá trình ghi file có lỗi thì sẽ báo lỗi.
+ *
+ * \param td: Đối tượng từ điển
+ * \sa napTuDien
+ */
 void luuTuDien(TuDien const &td) {
     std::string filename;
     std::cout << "\nLuu vao file:\n"
@@ -129,6 +210,19 @@ void luuTuDien(TuDien const &td) {
     }
 }
 
+//! Hàm hiện menu lựa chọn chức năng chương trình
+/*!
+ * Hiện menu lựa chọn các chức năng: Nạp từ điển (#napTuDien),
+ * tìm kiếm (#timKiem), sửa đổi từ (#suaDoiTu), thêm từ
+ * (#themTu), xóa từ (#xoaTu) và lưu từ điển (#luuTuDien).
+ *
+ * Mỗi khi thực hiện xong một chức năng thì chương trình lại
+ * trở lại menu và cho phép lựa chọn một chức năng khác. Quá
+ * trình lặp lại cho đến khi chọn chức năng thoát chương
+ * trình trong menu.
+ *
+ * \param td: Đối tượng từ điển
+ */
 void menu(TuDien &td) {
     std::string input;
     while (true) {

@@ -1,0 +1,101 @@
+/*!
+\mainpage Chương trình từ điển
+
+Đây là chương trình từ điển đơn giản sử dụng bảng băm
+để lưu trữ dữ liệu.
+
+\tableofcontents
+
+\section Algorithm Cấu trúc dữ liệu và giải thuật
+\subsection Hash Bảng băm và hàm băm:
+Bảng băm được cài đặt ở đây sử dụng phương pháp tạo chuỗi (chaining),
+tức là các khóa đụng độ (có cùng giá trị băm) sẽ được cho vào cùng
+một danh sách liên kết. 
+
+Nhược điểm của phương pháp này là nếu hàm băm không tốt thì có thể 
+các khóa chỉ cùng nằm trên một số ít danh sách liên kết thay vì phân 
+bố đồng đều. Do đó thao tác sẽ kém hiệu quả.
+
+Giải pháp ở đây là giới hạn số lượng khóa trung bình trên mỗi danh 
+sách liên kết sao cho không lớn hơn 1 hằng số (gọi là max_load_factor). 
+Ở đây ta lấy max_load_factor = 0.75. Khi nào bảng băm chứa só phần tử
+đủ nhiều thì ta tăng số danh sách liên kết lên. 
+(#BangBam::max_load_factor, #BangBam::rehash)
+
+Trong chương trình này ta chọn hàm 
+<a
+href="http://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash">
+FNV-1</a> để băm cho chuỗi (#HamBamChuoi::operator()()).
+
+\section structure Cấu trúc chương trình
+
+\subsection class Các lớp
+Chương trình sử dụng 2 lớp chính là #BangBam và #TuDien. Ngoài ra còn
+sử dụng các lớp hỗ trợ #HamBam, #HamBamChuoi, #SoSanhChuoi, 
+#TuDien::HamInTuDien.
+
+\subsubsection BangBam Lớp BangBam
+BangBam là một lớp template với khai báo như sau:
+\code{.cpp}
+template <typename Khoa, typename T, typename HamBam, typename HamSoSanh>
+class BangBam;
+\endcode
+\copydetails BangBam
+
+\subsubsection TuDien Lớp TuDien
+\copydetails TuDien
+
+\subsubsection otherclass Các lớp khác
+Chương trình có sử dụng các lớp hỗ trợ cho hai lớp #BangBam và #TuDien.
+
+Xem thêm: <a href="hierachy.html">Kiến trúc các lớp</a>
+
+\subsection function Các hàm từ do
+Các cài đặt chức năng của chương trình đều ở dưới dạng hàm tự do, nằm
+ở file main.cc.
+
+\subsection file Các file
+Mã nguồn chương trình gồm có 5 file:
+\arg bang_bam.hpp : Khai báo và cài đặt cho lớp BangBam. Vì đây là lớp
+template nên phải khai báo và cài đặt trong cùng một file
+\arg tu_dien.hh : Khai báo cho lớp TuDien
+\arg tu_dien.cc : Cài đặt lớp TuDien
+\arg main.cc : File chương trình chính.
+\arg Makefile : UNIX Makefile
+
+\section Compiling Biên dịch chương trình (trên *nix)
+Để biên dịch chương trình chỉ cần mở cửa sổ terminal, cd đến thư mục chứa mã
+nguồn chương trình và gõ lệnh make.
+Chương trình này chỉ sử dụng các thư viện của C++ Standard nên không cần
+phải cài thêm các thư viện ngoài.
+
+Sau khi biên dịch sẽ được một file tên là "tudien".
+
+\section Using Sử dụng chương trình
+\subsection CommandLine Gọi từ command line:
+Gọi chương trình từ command line bằng cú pháp sau (trên *nix):
+\code{.sh}
+./tudien [FILE]
+\endcode
+
+Hoặc trên Windows:
+\code{.sh}
+tudien.exe [FILE]
+\endcode
+
+Với "[FILE]" (tùy chọn) là đường dẫn đến file dữ liệu từ điển.
+Chương trình sẽ tự nạp dữ liệu từ điển trước khi hiện menu chính.
+
+Cũng có thể gọi chương trình bằng cách nhấn đúp vào file thực thi (trên
+Windows), nhưng nếu vậy thì không thể nạp dữ liệu ngay được.
+
+\subsection Function Các chức năng của chương trình
+Sau khi được gọi, chương trình sẽ hiện menu sau:
+    \image html menu.png
+    \image latex menu.eps "Menu chính" width=15cm
+
+Có tất cả 7 lựa chọn, tương ứng với 7 con số. Đánh số tương ứng để chọn chức
+năng. Nếu sai thì sẽ được yêu cầu đánh lại.
+Sau khi thực hiện 1 trong các chức năng từ 1 đến 6 thì sẽ trở lại menu chính.
+
+*/
