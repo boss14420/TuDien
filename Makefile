@@ -1,7 +1,7 @@
 all: tudien
 
-CXX = clang++
-CXXFLAGS = -g -Wall
+CXX = g++
+CXXFLAGS = -pipe -Wall -O2 -march=native
 
 tudien: main.o tu_dien.o
 	$(CXX) $(CXXFLAGS) $^ -o $@

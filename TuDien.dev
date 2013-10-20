@@ -1,7 +1,7 @@
 [Project]
 FileName=TuDien.dev
 Name=TuDien
-UnitCount=3
+UnitCount=4
 Type=1
 Ver=1
 ObjFiles=
@@ -11,14 +11,14 @@ PrivateResource=
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=
+CppCompiler=-Wall -pipe_@@_
 Linker=
 IsCpp=1
 Icon=
 ExeOutput=
 ObjectOutput=
 OverrideOutput=0
-OverrideOutputName=
+OverrideOutputName=TuDien.exe
 HostApplication=
 Folders=
 CommandLine=
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=
+CompilerSettings=0000001001001000000000
 
 [Unit2]
 FileName=tu_dien.cc
@@ -50,7 +50,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit4]
-FileName=tu_dien.hh
+FileName=bang_bam.hpp
 CompileCpp=1
 Folder=TuDien
 Compile=1
